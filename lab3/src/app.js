@@ -1,6 +1,12 @@
 const express = require("express");
 
-const { createTask, getAllTasks, getTaskById } = require("./task-service");
+const {
+  createTask,
+  getAllTasks,
+  getTaskById,
+  getTaskCount,
+  deleteAllTasks,
+} = require("./task-service");
 
 const app = express();
 
@@ -14,6 +20,12 @@ app.get("/health", (request, response) => {
 
 app.get("/tasks", (request, response) => {
   response.status(200).json(getAllTasks());
+});
+
+app.get("/tasks/count", (request, response) => {
+  response.status(200).json({
+    count: getTaskCount(),
+  });
 });
 
 app.get("/tasks/:id", (request, response) => {
@@ -41,6 +53,14 @@ app.post("/tasks", (request, response) => {
   const task = createTask(title.trim());
 
   return response.status(201).json(task);
+});
+
+app.delete("/tasks", (request, response) => {
+  const deletedCount = deleteAllTasks();
+
+  return response.status(200).json({
+    deletedCount,
+  });
 });
 
 module.exports = app;

@@ -19,6 +19,16 @@ function getTaskById(id) {
   return tasks.find((task) => task.id === id);
 }
 
+function getTaskCount() {
+  return tasks.length;
+}
+
+function deleteAllTasks() {
+  const deletedCount = tasks.length;
+  tasks.length = 0;
+  return deletedCount;
+}
+
 function createTask(title) {
   const task = {
     id: tasks.length + 1,
@@ -34,4 +44,6 @@ module.exports = {
   createTask,
   getAllTasks,
   getTaskById,
+  getTaskCount,
+  deleteAllTasks,
 };

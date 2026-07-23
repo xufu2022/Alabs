@@ -38,4 +38,53 @@ describe("Task API", () => {
       completed: false,
     });
   });
+
+  test("GET /tasks/count returns the number of tasks", async () => {
+    const tasksResponse = await request(app).get("/tasks");
+    const countResponse = await request(app).get("/tasks/count");
+
+    expect(countResponse.statusCode).toBe(200);
+    expect(countResponse.body).toEqual({
+      count: tasksResponse.body.length,
+    });
+  });
+
+  test("GET /tasks/count reflects a newly created task", async () => {
+    const before = await request(app).get("/tasks/count");
+
+    await request(app).post("/tasks").send({
+      title: "Track task counts",
+    });
+
+    const after = await request(app).get("/tasks/count");
+
+    expect(after.body.count).toBe(before.body.count + 1);
+  });
+
+  test("DELETE /tasks removes every task", async () => {
+    await request(app).post("/tasks").send({
+      title: "Task to be deleted",
+    });
+
+    const beforeCount = await request(app).get("/tasks/count");
+
+    const response = await request(app).delete("/tasks");
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      deletedCount: beforeCount.body.count,
+    });
+
+    const afterList = await request(app).get("/tasks");
+    expect(afterList.body).toEqual([]);
+  });
+
+  test("DELETE /tasks on an already-empty task list deletes nothing", async () => {
+    const response = await request(app).delete("/tasks");
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      deletedCount: 0,
+    });
+  });
 });
